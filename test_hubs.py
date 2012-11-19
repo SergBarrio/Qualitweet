@@ -2,11 +2,14 @@ import ujson
 import fileinput
 import requests
 import sys
+import ast
+import numpy as np
 from requests.auth import OAuth1
 
 def read_tweets():
     for line in fileinput.input():
-        yield ujson.loads(line)
+		dict_line = ast.literal_eval(line)
+		yield dict_line
 
 tweets = read_tweets()
 
@@ -20,12 +23,22 @@ queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owne
 retweet_sum = 0
 mention_sum = 0
 
+# adj_matrix = np.random.randint(1, size=(N, N))
+# print adj
+user_dict = {}
+
 for tweet in tweets:
 	# print tweet['screen_name']
 	# url = u'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=' + tweet['screen_name'] + '&count=20'
 	# r = requests.get(url, auth=queryoauth)
 	# print r.text
-	retweet_sum += tweet['retweet_count']
-	mention_sum += len(tweet['entities']['user_mentions'])
-print "Retweets: " + str(retweet_sum)
-print "Mentions: " + str(mention_sum)
+	
+	
+	#check if we need to initialize
+	if (tweet['user']['screen_name'] not in user_dict):
+		user_dict[tweet['user']['screen_name']] = {}
+		user_dict[tweet['user']['screen_name']]['retweets'] = 0
+		user_dict[tweet['user']['screen_name']]['mentions'] = 0
+	user_dict[tweet['user']['screen_name']]['retweets'] += tweet['retweet_count']
+	user_dict[tweet['user']['screen_name']]['mentions'] += len(tweet['entities']['user_mentions'])
+print user_dict
