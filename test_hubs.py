@@ -20,12 +20,19 @@ resource_owner_secret = u'cCzOjwfBa1YTqK8LFAJsaBBwvBxMp1vXkRuByMo'
 
 queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
 
-retweet_sum = 0
-mention_sum = 0
-
 # adj_matrix = np.random.randint(1, size=(N, N))
 # print adj
 user_dict = {}
+
+# I can think of two ways to do this
+# 1. Each tweet has it's own hubs/authorities matrix, maybe 2x2 or 3x3. 
+# Each value in it is something considered hub-like or authority-like
+# we find it, then we compute h and a against itself
+# 2. Go outside the corpus by one layer
+# Obviously we look within the tweets we find (probably expand the users we find)
+# But we also take the first 40-100 tweets of the users mentioned by the first users
+# If they mention or mention others we'll get a reasonable h/a matrix
+
 
 for tweet in tweets:
 	# print tweet['screen_name']
