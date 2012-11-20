@@ -24,11 +24,7 @@ queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owne
 # print adj
 user_dict = {}
 
-# I can think of two ways to do this
-# 1. Each tweet has it's own hubs/authorities matrix, maybe 2x2 or 3x3. 
-# Each value in it is something considered hub-like or authority-like
-# we find it, then we compute h and a against itself
-# 2. Go outside the corpus by one layer
+# Go outside the corpus by one layer
 # Obviously we look within the tweets we find (probably expand the users we find)
 # But we also take the first 40-100 tweets of the users mentioned by the first users
 # If they mention or mention others we'll get a reasonable h/a matrix
@@ -39,13 +35,47 @@ for tweet in tweets:
 	# url = u'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=' + tweet['screen_name'] + '&count=20'
 	# r = requests.get(url, auth=queryoauth)
 	# print r.text
+	curr_user = tweet['user']['screen_name']
 	
-	
-	#check if we need to initialize
+	# find user, see who they mentioned
 	if (tweet['user']['screen_name'] not in user_dict):
-		user_dict[tweet['user']['screen_name']] = {}
-		user_dict[tweet['user']['screen_name']]['retweets'] = 0
-		user_dict[tweet['user']['screen_name']]['mentions'] = 0
-	user_dict[tweet['user']['screen_name']]['retweets'] += tweet['retweet_count']
-	user_dict[tweet['user']['screen_name']]['mentions'] += len(tweet['entities']['user_mentions'])
-print user_dict
+		user_dict[curr_user] = {}
+		user_dict[curr_user]['mentioned'] = []
+		user_dict[curr_user]['mentioned_by'] = []
+	# list the users mentioned by a user and who mentioned that user
+	for mentioned_user in tweet['entities']['user_mentions']:
+		# don't add a mentioned user twice
+		if ( mentioned_user['screen_name'] not in user_dict[curr_user]['mentioned'] ):
+			user_dict[curr_user]['mentioned'].append(mentioned_user['screen_name'])
+			
+		# also add the mentioned user to the dictionary for the next part
+		if ( mentioned_user['screen_name'] not in user_dict ):
+			user_dict[mentioned_user['screen_name']] = {}
+			user_dict[mentioned_user['screen_name']]['mentioned'] = []
+			user_dict[mentioned_user['screen_name']]['mentioned_by'] = []
+			
+		# now add current user to the mentioned users 'mentioned_by'
+		if ( curr_user not in user_dict[mentioned_user['screen_name']]['mentioned_by'] ):
+			user_dict[mentioned_user['screen_name']]['mentioned_by'].append(curr_user)
+
+# We now have a dictionary
+# start with a 'row' of all zeroes
+adjacency = []
+adjacency = adjacency + [0]*(len(user_dict) - len(adjacency))
+# Adjacency Matrix
+A = np.zeros( shape=(len(user_dict), len(user_dict)) )
+# keep track of A's rows
+outer_count = 0
+for mentioning_user in user_dict:
+	inner_count = 0
+	for mentioned_user in user_dict:
+		if( mentioned_user in user_dict[mentioning_user]['mentioned'] ):
+			adjacency[inner_count] = 1
+		else:
+			adjacency[inner_count] = 0
+		inner_count += 1
+	# print adjacency
+	A[outer_count] = adjacency
+	outer_count += 1
+print np.dot(A, np.transpose(A))
+print np.dot(np.transpose(A), A)
