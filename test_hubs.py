@@ -18,6 +18,8 @@ class Qualitweet(object):
         client_secret = u'leXE8HDyCxJMKzNSjv0xkxSwj3a8qaonuyIP0Gito'
         resource_owner_key = u'43041495-m2utOeJQseujCsNdvtfrzml9ftz0b0xUbPRIkQ'
         resource_owner_secret = u'cCzOjwfBa1YTqK8LFAJsaBBwvBxMp1vXkRuByMo'
+        
+        self.scores = []
 
         self.queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
         
@@ -60,6 +62,8 @@ class Qualitweet(object):
                 
                 
     def compute_score(self):
+        self.scores = []
+    
         # We now have a dictionary
         # start with a 'row' of all zeroes
         adjacency = []
@@ -79,12 +83,12 @@ class Qualitweet(object):
             # print adjacency
             A[outer_count] = adjacency
             outer_count += 1
-        print np.dot(A, np.transpose(A))
-        print np.dot(np.transpose(A), A)
+            
+        self.scores = [np.dot(A, np.transpose(A)), np.dot(np.transpose(A), A)]
         
 if __name__ == '__main__':
     tweets = read_tweets()
-
+    
     algorithm = Qualitweet()
     algorithm.index_tweets(tweets)
     algorithm.compute_score()

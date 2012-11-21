@@ -1,5 +1,6 @@
 import unittest
 import test_hubs
+import numpy as np
 
 
 MENTION_CORPUS = [
@@ -36,3 +37,61 @@ MENTION_CORPUS = [
 ]
 
 class TestQualitweet(unittest.TestCase):
+    def setUp(self):
+        self.qualitweet = test_hubs.Qualitweet()
+        
+    def test_index_tweets(self):
+    
+        test_dict = {
+                'charlie': {
+                    'mentioned': ['alice', 'bob'], 
+                    'mentioned_by': ['BOB']
+                }, 
+                 'Diane': {
+                    'mentioned': ['bob'], 
+                    'mentioned_by': []
+                },
+                 'alice': {
+                    'mentioned': [], 
+                    'mentioned_by': ['charlie', 'BOB']
+                }, 
+                'Alice': {
+                    'mentioned': [], 
+                    'mentioned_by': []
+                }, 
+                'bob' : {
+                    'mentioned': [], 
+                    'mentioned_by': ['Diane', 'charlie']
+                }, 
+                'BOB': {
+                    'mentioned': ['alice', 'charlie'], 
+                    'mentioned_by': []
+                }
+            }
+    
+        self.qualitweet.index_tweets(MENTION_CORPUS)
+        self.assertEqual(test_dict,self.qualitweet.user_dict)
+        
+    def test_compute_score(self):
+    
+        authority = [[ 2, 1, 0, 0, 0, 1],
+                     [ 1, 1, 0, 0, 0, 0],
+                     [ 0, 0, 0, 0, 0, 0],
+                     [ 0, 0, 0, 0, 0, 0],
+                     [ 0, 0, 0, 0, 0, 0],
+                     [ 1, 0, 0, 0, 0, 2]]
+                     
+        hubs =  [[ 1, 0, 1, 0, 0, 0],
+                 [ 0, 0, 0, 0, 0, 0],
+                 [ 1, 0, 2, 0, 1, 0],
+                 [ 0, 0, 0, 0, 0, 0],
+                 [ 0, 0, 1, 0, 2, 0],
+                 [ 0, 0, 0, 0, 0, 0]]
+    
+        self.qualitweet.index_tweets(MENTION_CORPUS)
+        self.qualitweet.compute_score()
+        print self.qualitweet.scores[1]
+        
+        
+if __name__ == '__main__':
+    unittest.main()
