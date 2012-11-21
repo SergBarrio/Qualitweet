@@ -20,7 +20,7 @@ class Qualitweet(object):
         
         self.scores = []
 
-        self.queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
+        #self.queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
 
         
     def index_tweets(self,tweets):
