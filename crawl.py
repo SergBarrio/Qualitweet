@@ -9,10 +9,10 @@ import os
 # https://dev.twitter.com/docs/api/1/post/statuses/filter
 # You will need to change the SCREEN_NAME and PASSWORD below.
 
-client_key = u'23C1viXJOPhm35xYXnodg'
-client_secret = u'leXE8HDyCxJMKzNSjv0xkxSwj3a8qaonuyIP0Gito'
-resource_owner_key = u'43041495-m2utOeJQseujCsNdvtfrzml9ftz0b0xUbPRIkQ'
-resource_owner_secret = u'cCzOjwfBa1YTqK8LFAJsaBBwvBxMp1vXkRuByMo'
+client_key = u''
+client_secret = u''
+resource_owner_key = u''
+resource_owner_secret = u''
 
 queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
 
