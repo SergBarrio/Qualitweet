@@ -74,24 +74,41 @@ class TestQualitweet(unittest.TestCase):
         
     def test_compute_score(self):
     
-        authority = [[ 2, 1, 0, 0, 0, 1],
-                     [ 1, 1, 0, 0, 0, 0],
-                     [ 0, 0, 0, 0, 0, 0],
-                     [ 0, 0, 0, 0, 0, 0],
-                     [ 0, 0, 0, 0, 0, 0],
-                     [ 1, 0, 0, 0, 0, 2]]
+        hub = [[ 2, 1, 0, 0, 0, 1],
+                 [ 1, 1, 0, 0, 0, 0],
+                 [ 0, 0, 0, 0, 0, 0],
+                 [ 0, 0, 0, 0, 0, 0],
+                 [ 0, 0, 0, 0, 0, 0],
+                 [ 1, 0, 0, 0, 0, 2]]
                      
-        hubs =  [[ 1, 0, 1, 0, 0, 0],
-                 [ 0, 0, 0, 0, 0, 0],
-                 [ 1, 0, 2, 0, 1, 0],
-                 [ 0, 0, 0, 0, 0, 0],
-                 [ 0, 0, 1, 0, 2, 0],
-                 [ 0, 0, 0, 0, 0, 0]]
+        authority =  [[ 1, 0, 1, 0, 0, 0],
+                     [ 0, 0, 0, 0, 0, 0],
+                     [ 1, 0, 2, 0, 1, 0],
+                     [ 0, 0, 0, 0, 0, 0],
+                     [ 0, 0, 1, 0, 2, 0],
+                     [ 0, 0, 0, 0, 0, 0]]
     
         self.qualitweet.index_tweets(MENTION_CORPUS)
         self.qualitweet.compute_score()
-        print self.qualitweet.scores[1]
         
+        calculated_hub = self.qualitweet.scores[0]
+        calculated_auth = self.qualitweet.scores[1]
+        
+        i = 0
+        for row in hub:
+            j = 0
+            for score in row:
+                self.assertEqual(score,calculated_hub[i][j])
+                j = j + 1
+            i = i + 1
+        
+        i = 0
+        for row in authority:
+            j = 0
+            for score in row:
+                self.assertEqual(score,calculated_auth[i][j])
+                j = j + 1
+            i = i + 1
         
 if __name__ == '__main__':
     unittest.main()

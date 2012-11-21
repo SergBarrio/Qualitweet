@@ -82,10 +82,10 @@ class Qualitweet(object):
 
         self.scores = [np.dot(A, np.transpose(A)), np.dot(np.transpose(A), A)]
             
-        print "Hub"
-        print np.dot(A, np.transpose(A))
-        print "Authority"
-        print np.dot(np.transpose(A), A)
+        #print "Hub"
+        #print np.dot(A, np.transpose(A))
+        #print "Authority"
+        #print np.dot(np.transpose(A), A)
         
 if __name__ == '__main__':
     tweets = read_tweets()
