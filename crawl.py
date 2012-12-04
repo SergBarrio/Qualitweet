@@ -18,6 +18,7 @@ queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owne
 
 # build corpus of 40 tweets each from the found users
 page = 1
+f = open('test.json', 'w')
 while (page < 5):
 	# This will get 20 (the max) users on one page
 	url = u'https://api.twitter.com/1/users/search.json?q=' + '%20'.join(sys.argv[1:]) + '&page=' + repr(page) + '&per_page=20'
@@ -29,5 +30,5 @@ while (page < 5):
 		url = u'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=' + user['screen_name'] + '&count=40'
 		corpus_r = requests.get(url, auth=queryoauth)
 		for tweet in corpus_r.json:
-			print tweet
+			f.write( str(tweet)+'\n' )
 	page+=1
