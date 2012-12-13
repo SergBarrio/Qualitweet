@@ -1,5 +1,5 @@
 ***USING THE CRAWLER***
-To gather our test data, I used the file crawl.py, which is a 
+To gather our test data we have a function crawl() in hits.py, which is a 
 modification of the file given to us by Jeff on the Google group.
 To use it, you must first provide yor own authentication, then
 you simply use the command "python crawl.py 'some search query'"
@@ -16,7 +16,7 @@ python module to make a literal evaluation of the tweets in the function
 read_tweets(). Other than this, the tweets operate the same as in the homeworks.
 
 ***THE ALGORITHM***
-test_hubs.py creates an adjacency matrix of all the users in a file that is fed to
+hits.py creates an adjacency matrix of all the users in a file that is fed to
 it. The matrix includes users who have tweets in the corpus as well as any users
 that are merely mentioned in the corpus. This means that 'adjacency' is defined
 as 'mentioned by'.
