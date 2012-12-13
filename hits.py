@@ -13,49 +13,49 @@ import os
 # https://dev.twitter.com/docs/api/1/post/statuses/filter
 # You will need to change the SCREEN_NAME and PASSWORD below.
 
-def crawl():
-    client_key = u''
-    client_secret = u''
-    resource_owner_key = u''
-    resource_owner_secret = u''
-    
-    queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
-    
-    # build corpus of 40 tweets each from the found users
-    page = 1
-    f = open('corpus.json', 'w')
-    while (page < 5):
-        # This will get 20 (the max) users on one page
-        url = u'https://api.twitter.com/1/users/search.json?q=' + '%20'.join(sys.argv[1:]) + '&page=' + repr(page) + '&per_page=20'
-    
-        r = requests.get(url, auth=queryoauth)
-        
-        for user in r.json:
-            # print user['screen_name']
-            url = u'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=' + user['screen_name'] + '&count=40'
-            corpus_r = requests.get(url, auth=queryoauth)
-            for tweet in corpus_r.json:
-                f.write( str(tweet)+'\n' )
-        page+=1
-    f.close()
-
-def read_tweets():
-    f = open('corpus.json', 'r')
-    for line in f:
-        dict_line = ast.literal_eval(line)
-        yield dict_line
-
 class Qualitweet(object):
     def __init__(self):    
 
-        client_key = u'23C1viXJOPhm35xYXnodg'
-        client_secret = u'leXE8HDyCxJMKzNSjv0xkxSwj3a8qaonuyIP0Gito'
-        resource_owner_key = u'43041495-m2utOeJQseujCsNdvtfrzml9ftz0b0xUbPRIkQ'
-        resource_owner_secret = u'cCzOjwfBa1YTqK8LFAJsaBBwvBxMp1vXkRuByMo'
+        #client_key = u'23C1viXJOPhm35xYXnodg'
+        #client_secret = u'leXE8HDyCxJMKzNSjv0xkxSwj3a8qaonuyIP0Gito'
+        #resource_owner_key = u'43041495-m2utOeJQseujCsNdvtfrzml9ftz0b0xUbPRIkQ'
+        #resource_owner_secret = u'cCzOjwfBa1YTqK8LFAJsaBBwvBxMp1vXkRuByMo'
         
         self.scores = []
 
         #self.queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
+        
+    def crawl(self,query):
+        client_key = u'arrbro3YTv2A6KPptQQcXg'
+        client_secret = u'1WF24ePPs7SN3M0lojOTuMb1yF0W0yhnFPAOQGN0'
+        resource_owner_key = u'486242818-qBEzxhfMSUac7ZnQCG69Ww3NfUcGJIZR7bB8yC10'
+        resource_owner_secret = u'247XsNb0no7PjjI4ae012SnsPf0c9eeFxd914TunaI'
+    
+        queryoauth = OAuth1(client_key, client_secret, resource_owner_key, resource_owner_secret, signature_type='query')
+    
+        # build corpus of 40 tweets each from the found users
+        page = 1
+        f = open('corpus.json', 'w')
+        while (page < 2):
+            # This will get 20 (the max) users on one page
+            url = u'https://api.twitter.com/1/users/search.json?q=' + '%10'.join(query) + '&page=' + repr(page) + '&per_page=10'
+            r = requests.get(url, auth=queryoauth)
+        
+            for user in r.json:
+                # print user['screen_name']
+                # print user.status
+                url = u'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=' + user['screen_name'] + '&count=40'
+                corpus_r = requests.get(url, auth=queryoauth)
+                for tweet in corpus_r.json:
+                    f.write( str(tweet)+'\n' )
+            page+=1
+        f.close()
+
+    def read_tweets(self):
+        f = open('corpus.json', 'r')
+        for line in f:
+            dict_line = ast.literal_eval(line)
+            yield dict_line
 
         
     def index_tweets(self,tweets):
@@ -78,7 +78,7 @@ class Qualitweet(object):
             # list the users mentioned by a user and who mentioned that user
             for mentioned_user in tweet['entities']['user_mentions']:
                 # don't add a mentioned user twice
-                if ( mentioned_user['screen_name'] not in self.user_dict[curr_user]['mentioned'] ):
+                if ( mentioned_user['screen_name'] not in self.user_dict[curr_user]['mentioned'] and mentioned_user['screen_name'] != tweet['user']['screen_name']):
                     self.user_dict[curr_user]['mentioned'].append(mentioned_user['screen_name'])
                     
                 # also add the mentioned user to the dictionary for the next part
@@ -123,17 +123,18 @@ class Qualitweet(object):
         principal = v[:,i]
         print self.user_dict.keys()[principal.argmax()]
         print "Authority:"
-        w, v = LA.eig(np.dot(A, np.transpose(A)))
+        w, v = LA.eig(np.dot(np.transpose(A), A))
         i = np.real_if_close(w).argmax()
         principal = v[:,i]
         print self.user_dict.keys()[principal.argmax()]
         #print self.user_dict
         
 if __name__ == '__main__':
-    crawl()
-	
-    tweets = read_tweets()
-    
     algorithm = Qualitweet()
+  
+    algorithm.crawl(sys.argv[1:])
+	
+    tweets = algorithm.read_tweets()
+    
     algorithm.index_tweets(tweets)
     algorithm.compute_score()
